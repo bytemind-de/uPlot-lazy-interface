@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>More Graphs</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script src="uPlot.iife.min-1.5.2.js"></script>
+		<link rel="stylesheet" href="uPlot.min-1.5.2.css">
+		
+		<!-- import this AFTER uPlot -->
+		<!--<script src="../src/uPlot-lazy.js"></script>-->
+		<script src="../dist/uPlot-lazy.min.js"></script>
+		<style>
+			body {
+				margin: 0;
+				text-align: center;
+				background: #1e2125;
+				color: #eee;
+				font-family: sans-serif;
+			}
+			.chart {
+				display: inline-block;
+				margin: 30px 0;
+				width: 80%;
+				height: 258px;	/* includes title and legend if set */
+				border: 1px solid #888;
+				overflow: auto;
+			}
+			.u-select {
+				background: rgba(255,255,255,0.07);
+			}
+			.u-marker {
+				border-radius: 1px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>uPlot Lazy Examples 2</h2>
+		<div><button onclick="start();">START</button><button onclick="stop();">STOP</button></div>
+		<div id="plot-1" class="chart"></div>
+		<div id="plot-2" class="chart"></div>
+		<script>
+			//some demo data
+			var amplitude = 40;
+			var frequency = 20;
+			var shift1 = 32;
+			var x1 = [0];
+			var y1 = [getSine(0)];
+			var y2 = [getSine(0 + shift1)];
+			var x2 = [0];
+			var y3 = [getNoise()];
+			
+			function getSine(x){
+				return Math.round(amplitude * Math.sin(x/frequency));
+			}
+			function getNoise(x){
+				return (Math.random()*2 - 1);
+			}
+			
+			//Prepare plots
+			var target1 = document.getElementById("plot-1");
+			var plotOptions1 = uPlot.lazy.getPlotOptions({
+				targetElement: target1,
+				title: "Sine Waves",
+				drawType: "line_linear",
+				//pointSize: 4,
+				//pointWidth: 1,
+				//fill: ["#e24d421a", "#3caea31a"],
+				//xRange: [0, 100],
+				yRange: [-1*(amplitude + 10), amplitude + 10],
+				showLegend: true,
+				xLabel: "t",
+				yLabel: ["Sine A", "Sine B"],
+				data: [x1, y1, y2]
+			});
+			var plot1 = uPlot.lazy.plotWithOptions(plotOptions1, [x1, y1, y2]);
+			
+			var target2 = document.getElementById("plot-2");
+			var plot2 = uPlot.lazy.plot({
+				targetElement: target2,
+				title: "Noise",
+				drawType: "line_linear",
+				strokeWidth: 1,
+				yRange: [-1, 1],
+				showLegend: false,
+				showPoints: false,
+				data: [x2, y3]
+			});
+			
+			var t = 0;
+			var timesteps;
+			function start(){
+				timesteps = setInterval(function(){
+					t+=2;
+					x1.push(t);
+					x2.push(t);
+					y1.push(getSine(t));
+					y2.push(getSine(t + shift1));
+					y3.push(getNoise());
+					if (x1.length > 150){
+						x1.shift();
+						y1.shift();
+						y2.shift();
+					}
+					if (x2.length > 1000){
+						x2.shift();
+						y3.shift();
+					}
+					plot1.setData([x1, y1, y2]);
+					plot2.setData([x2, y3]);
+				}, 1000/20);
+			}
+			function stop(){
+				clearInterval(timesteps);
+			}
+		</script>
+	</body>
+</html>

@@ -1,2 +1,54 @@
-# uPlot-lazy-interface
-Interface for uPlot to simplify basic chart plotting
+# uPlot Lazy Interface
+
+Simplified interface for [uPlot](https://github.com/leeoniya/uPlot) the lightweight (~30KB), super fast (check the benchmarks) chart library.  
+  
+uPlot is a great library to visualize time series data, but getting started can be a bit complicated due to the many settings options and the interface that was designed to optimize performance.
+If you don't need to tweak your charts down to the last detail but just want to quickly plot some basic point-, line- or bar-charts with reasonable defaults then 'uPlot-lazy' (~4KB) is the right extension for you ;-).
+  
+## Quick start
+
+First include the uPlot library then add uPlot-lazy like this:
+```
+<script src="uPlot.iife.min.js"></script>
+<link rel="stylesheet" href="uPlot.min.css">
+<script src="uPlot-lazy.min.js"></script>
+```
+
+All "lazy" interfaces will be available via: `uPlot.lazy`.  
+To plot a graph with default settings (points connected by straight lines) simply use:
+```
+<div id="my-chart"></div>
+<script>
+	...
+	var data = [x, y1, y2];
+	var plot = uPlot.lazy.plot({
+		targetElement: document.getElementById("my-chart"),
+		title: "Default Settings",
+		data: data
+	});
+</script>
+```
+  
+## Examples
+
+See 'examples' folder or https://byteteilchen.de/uplot-lazy/index.html and https://byteteilchen.de/uplot-lazy/index2.html
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/line_linear.png" alt="line_linear"/>
+</p>
+<p align="center">
+  <img src="screenshots/points.png" alt="points"/>
+</p>
+<p align="center">
+  <img src="screenshots/line_smooth.png" alt="line_smooth"/>
+</p>
+<p align="center">
+  <img src="screenshots/bars.png" alt="bars"/>
+</p>
+<p align="center">
+  <img src="screenshots/custom_step.png" alt="custom_step"/>
+</p>
+
+

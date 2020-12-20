@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Basic Graph Types</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script src="uPlot.iife.min-1.5.2.js"></script>
+		<link rel="stylesheet" href="uPlot.min-1.5.2.css">
+		
+		<!-- import this AFTER uPlot -->
+		<!--<script src="../src/uPlot-lazy.js"></script>-->
+		<script src="../dist/uPlot-lazy.min.js"></script>
+		<style>
+			body {
+				margin: 0;
+				text-align: center;
+				background: #1e2125;
+				color: #eee;
+				font-family: sans-serif;
+			}
+			.chart {
+				display: inline-block;
+				margin: 30px 0;
+				width: 80%;
+				height: 258px;	/* includes title and legend if set */
+				border: 1px solid #888;
+				overflow: auto;
+			}
+			.u-select {
+				background: rgba(255,255,255,0.07);
+			}
+			.u-marker {
+				border-radius: 1px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>uPlot Lazy Examples 1</h2>
+		<div id="default" class="chart"></div>
+		<div id="points" class="chart"></div>
+		<div id="line-linear" class="chart"></div>
+		<div id="line-smooth" class="chart"></div>
+		<div id="bars" class="chart"></div>
+		<div id="custom" class="chart" style="border-color: #3aa298;"></div>
+		<script>
+			//some demo data
+			var x = uPlot.lazy.createSequence(30, 70);	//integer number sequence (start, N) - 70 points: 30, 31, ..., 99
+			var y1 = uPlot.lazy.createRandomNumbers(-90, 90, x.length);		//random numbers (min, max, N, customFunction=Math.round)
+			var y2 = uPlot.lazy.createRandomNumbers(-90, 90, x.length);
+			var y3 = uPlot.lazy.createRandomNumbers(-90, 90, x.length);
+			var y4 = uPlot.lazy.createRandomNumbers(-90, 90, x.length);
+			var data1 = [x, y1];
+			var data2 = [x, y1, y2];
+			var data3 = [x, y1, y2, y3];
+			var data4 = [x, y1, y2, y3, y4];
+			
+			//defaults, can be overwritten globally or used as option:
+			uPlot.lazy.chartBackground = "#141619";
+			uPlot.lazy.chartTextColor = "#c7d0d9";
+			uPlot.lazy.axisStroke = "#c7d0d9";
+			uPlot.lazy.axisGridStroke = "#2c3235";
+			uPlot.lazy.axisFont = "12px sans-serif";
+			uPlot.lazy.axisGridSize = 1;
+			uPlot.lazy.axisTickSize = 1;
+			uPlot.lazy.pointSize = 6;
+			uPlot.lazy.pointWidth = 1;
+			uPlot.lazy.strokeWidth = 2;
+			uPlot.lazy.colorPalette = ["#e24d42", "#3caea3", "#f6d55c", "#20639b"];		//add more as needed
+			uPlot.lazy.fillPalette =  ["#e24d42aa", "#3caea3aa", "#f6d55caa", "#20639baa"];	// "	"
+			//fixed defaults:
+			uPlot.lazy.defaultPathRenderer = uPlot.paths.linear();
+			uPlot.lazy.defaultLegendHeight = 31;	//TODO: can depend on legend content
+			uPlot.lazy.defaultTitleHeight = 27;		//TODO: can depend on title content
+			uPlot.lazy.defaultBorderWidth = 1;		//TODO: depends on parent CSS
+			
+			//add custom drawType
+			uPlot.lazy.drawTypes["step_fun"] = uPlot.paths.stepped({align: 1});
+			
+			//show possible draw types
+			console.log("Possible draw types:", Object.keys(uPlot.lazy.drawTypes));
+			
+			//Example 1 - default settings with custom title
+			var plot1 = uPlot.lazy.plot({
+				targetElement: document.getElementById("default"),
+				title: "Default Settings",
+				data: data2		//data: [x, y1, y2, ...]
+			});
+			//automatically resize this plot
+			window.addEventListener("resize", function(){ 
+				uPlot.lazy.resizePlot(plot1); 	//this will take real title and legend size into account
+			});
+		
+			//Example 2 - points
+			var data = data4;
+			var target = document.getElementById("points");
+			var plotOptions = uPlot.lazy.getPlotOptions({	//this example loads options first ...
+				targetElement: target,
+				title: "Points",
+				drawType: "points",		//drawType as shown at top
+				//pointSize: 6,			//size for every point (low priority)
+				//pointWidth: 1,		//(border) width for every point (low priority)
+				/*points: {				//use one object for all or array of objects for each series,
+					show: true,			//... missing fields are filled with defaults
+					size: 6,			//... high priority
+					width: 1,
+					stroke: "#ffffff",
+					fill: "#aaaaaa"
+				},*/
+				points: [{ size: 6 }, { size: 8 }, { size: 10 }, { size: 12 }],		//recommended way
+				//stroke: ["#e24d42", "#3caea3", "#f6d55c", "#20639b"],				//fallback point colors
+				//fill: ["#e24d421a", "#3caea31a", "#f6d55c1a", "#20639b1a"],		//fallback point colors
+				yRange: [-110, 110],	//use fix range for y-axis
+				showLegend: true,
+				xLabel: "x",
+				yLabel: ["red", "green", "yellow", "blue"],		//single string or array
+				data: data
+			});
+			var plot2 = uPlot.lazy.plotWithOptions(plotOptions, data);	//... use options with data
+			
+			//Example 3 - lines
+			uPlot.lazy.plot({
+				targetElement: document.getElementById("line-linear"),
+				title: "Line (linear)",
+				drawType: "line_linear",
+				//stroke: "#fff",
+				fill: ["#e24d421a", null],	//fill area below line for 1st data set
+				showPoints: false,			//don't show points by default ...
+				points: [null, { show: true, size: 4 }],	//... but show them for 2nd data set
+				showLegend: true,
+				strokeWidth: 2,				//strokeWidth for all data sets
+				data: data2
+			});
+			
+			//Example 4 - lines smooth
+			uPlot.lazy.plot({
+				targetElement: document.getElementById("line-smooth"),
+				title: "Line (smooth + fill)",
+				drawType: "line_smooth",
+				stroke: "#E24D42",			//if we only have one data set this can be a simple string
+				strokeWidth: 1,
+				fill: "#E24D421A",			//... same goes for area fill color
+				showLegend: true,
+				data: data1
+			});
+			
+			//Example 5 - bars
+			uPlot.lazy.plot({
+				targetElement: document.getElementById("bars"),
+				title: "Bar Chart",
+				drawType: "bars",
+				stroke: "#E24D42",
+				strokeWidth: 1,
+				fill: "#E24D42AA",
+				xRange: [29, 100],		//we fix the x-range to make first (30) and last (99) bar fully visible
+				showPoints: false,
+				showLegend: true,
+				xLabel: "time",
+				yLabel: "value",
+				data: data1				//TODO: multiple bars don't work well here
+			});
+			
+			//Example 6 - custom
+			uPlot.lazy.plot({
+				targetElement: document.getElementById("custom"),
+				chartBackground: "#fff",
+				chartTextColor: "#000",
+				axisStroke: "#000",
+				axisGridStroke: "#ccc",
+				title: "Custom (step-function)",
+				drawType: "step_fun",		//the custom renderer defined at the beginning
+				/* the same renderer defined ad-hoc:
+				customPathRenderer: function(u, seriesIdx, idx0, idx1, extendGap, buildClip){
+					let renderer = uPlot.paths.stepped({align: 1});
+					return renderer(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+				},
+				*/
+				stroke: "#E24D42",
+				strokeWidth: 2,
+				fill: "#E24D421A",
+				xRange: [29, 100],
+				showPoints: true,
+				showLegend: false,
+				data: data1
+			});
+		</script>
+	</body>
+</html>
