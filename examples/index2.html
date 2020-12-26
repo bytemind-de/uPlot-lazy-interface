@@ -36,21 +36,17 @@
 		</style>
 	</head>
 	<body>
-		<h2>uPlot Lazy Examples 2</h2>
+		<h2>uPlot Lazy Examples 2 - Dynamic Series</h2>
 		<div><button onclick="start();">START</button><button onclick="stop();">STOP</button></div>
 		<div id="plot-1" class="chart"></div>
-		<div id="plot-2" class="chart"></div>
+		<h3 style="margin-bottom: 4px;">Noise</h3>
+		<div id="plot-2" class="chart" style="margin-top: 0;"></div>
 		<script>
 			//some demo data
 			var amplitude = 40;
 			var frequency = 20;
 			var shift1 = 32;
-			var x1 = [0];
-			var y1 = [getSine(0)];
-			var y2 = [getSine(0 + shift1)];
-			var x2 = [0];
-			var y3 = [getNoise()];
-			
+						
 			function getSine(x){
 				return Math.round(amplitude * Math.sin(x/frequency));
 			}
@@ -60,55 +56,41 @@
 			
 			//Prepare plots
 			var target1 = document.getElementById("plot-1");
-			var plotOptions1 = uPlot.lazy.getPlotOptions({
-				targetElement: target1,
+			var target2 = document.getElementById("plot-2");
+			
+			var autoSeries1 = new uPlot.lazy.AutoSeries(target1, 150, {x0: 0, xStep: 1}, {
 				title: "Sine Waves",
 				drawType: "line_linear",
 				//pointSize: 4,
 				//pointWidth: 1,
 				//fill: ["#e24d421a", "#3caea31a"],
-				//xRange: [0, 100],
 				yRange: [-1*(amplitude + 10), amplitude + 10],
+				//rememberMax: true,
 				showLegend: true,
-				xLabel: "t",
-				yLabel: ["Sine A", "Sine B"],
-				data: [x1, y1, y2]
+				xLabel: "x",
+				yLabel: ["Sine A", "Sine B"]
 			});
-			var plot1 = uPlot.lazy.plotWithOptions(plotOptions1, [x1, y1, y2]);
 			
-			var target2 = document.getElementById("plot-2");
-			var plot2 = uPlot.lazy.plot({
-				targetElement: target2,
-				title: "Noise",
+			var autoSeries2 = new uPlot.lazy.AutoSeries(target2, 1000, {x0: 0, xStep: 1}, {
+				//title: "Noise",
 				drawType: "line_linear",
 				strokeWidth: 1,
-				yRange: [-1, 1],
+				//yRange: [-1, 1],
+				rememberMax: true,
+				showAxisX: false,
 				showLegend: false,
-				showPoints: false,
-				data: [x2, y3]
+				showPoints: false
 			});
 			
 			var t = 0;
 			var timesteps;
 			function start(){
 				timesteps = setInterval(function(){
+					autoSeries1.addValues(getSine(t), getSine(1.5*t + shift1));
+					autoSeries2.addValues(getNoise());
+					autoSeries1.draw();
+					autoSeries2.draw();
 					t+=2;
-					x1.push(t);
-					x2.push(t);
-					y1.push(getSine(t));
-					y2.push(getSine(t + shift1));
-					y3.push(getNoise());
-					if (x1.length > 150){
-						x1.shift();
-						y1.shift();
-						y2.shift();
-					}
-					if (x2.length > 1000){
-						x2.shift();
-						y3.shift();
-					}
-					plot1.setData([x1, y1, y2]);
-					plot2.setData([x2, y3]);
 				}, 1000/20);
 			}
 			function stop(){
