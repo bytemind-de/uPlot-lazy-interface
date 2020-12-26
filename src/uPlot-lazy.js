@@ -52,11 +52,11 @@
 		return {
 			x: {
 				time: !!cfg.isTime,
-				auto: !cfg.xRange,
+				auto: (cfg.xRangeAuto != undefined? cfg.xRangeAuto : !cfg.xRange),
 				range: cfg.xRange
 			},
 			y: {
-				auto: !cfg.yRange,
+				auto: (cfg.yRangeAuto != undefined? cfg.yRangeAuto : !cfg.yRange),
 				range: cfg.yRange
 			}
 		}
@@ -70,6 +70,7 @@
 		var axisGridSize = cfg.axisGridSize || uPlot.lazy.axisGridSize;
 		return [
 			{
+				show: (cfg.showAxisX != undefined? cfg.showAxisX : true),
 				stroke: axisStroke,
 				font: axisFont,
 				labelFont: axisFont,
@@ -82,6 +83,7 @@
 					stroke: axisGridStroke,
 				}
 			},{
+				show: (cfg.showAxisY != undefined? cfg.showAxisY : true),
 				stroke: axisStroke,
 				font: axisFont,
 				labelFont: axisFont,
@@ -226,5 +228,79 @@
 		containerSize.height -= (2* uPlot.lazy.defaultBorderWidth);
 		containerSize.width -= (2* uPlot.lazy.defaultBorderWidth);
 		return {height: containerSize.height, width: containerSize.width}
+	}
+	
+	//Line plots
+	uPlot.lazy.AutoSeries = function(targetElement, maxDataPoints, seriesOptions, plotOptions){
+		if (!seriesOptions) seriesOptions = {};
+		if (!plotOptions) plotOptions = {};
+		var data;
+		var i = seriesOptions.x0 || 0;
+		var xIsTimestamp = (seriesOptions.xIsTimestamp != undefined)? seriesOptions.xIsTimestamp : false;
+		var xStep = seriesOptions.xStep || 1;
+		var plot;
+		var rememberMax = (seriesOptions.rememberMax != undefined)? seriesOptions.rememberMax : false;
+		var yRange = seriesOptions.yRange || plotOptions.yRange;
+		if (plotOptions.yRange) delete plotOptions.yRange;		//we handle this here so it can be controlled directly
+		var maxY, minY;
+				
+		this.addValues = function(...yy){
+			if (!data){
+				data = new Array(yy.length + 1);	//x, y1, y2, ... NOTE: fixed after first add
+				for (let j=0; j<data.length; j++){
+					data[j] = [];
+				}
+			}
+			if (xIsTimestamp){
+				data[0].push(Date.now()); 
+			}else{
+				data[0].push(i);
+				i += xStep;
+			}
+			for (let j=1; j<data.length; j++){
+				data[j].push(yy[j-1]);
+			}
+			if (maxDataPoints && data[0].length > maxDataPoints){
+				for (let j=0; j<data.length; j++){
+					data[j].shift();
+				}
+			}
+		}
+		this.setData = function(newData){
+			data = newData;
+		}
+		this.setRangeY = function(newRange, newRememberMax){
+			yRange = newRange;
+			if (newRememberMax != undefined) rememberMax = newRememberMax;
+		}
+		this.draw = function(){
+			if (!plot){
+				var options = {
+					targetElement: targetElement,
+					drawType: "line_linear",
+					showPoints: false,
+					strokeWidth: 1,
+					showAxisX: true,
+					yRange: function(self, newMin, newMax){
+						if (rememberMax){
+							minY = (minY == undefined)? newMin : Math.min(minY, newMin);
+							maxY = (maxY == undefined)? newMax : Math.max(maxY, newMax);
+							return [minY, maxY];
+						}else if (yRange){ 
+							return yRange; 
+						}else{
+							return [newMin, newMax];
+						}
+					},
+					yRangeAuto: true,
+					data: data
+				};
+				if (plotOptions) Object.assign(options, plotOptions);
+				plot = uPlot.lazy.plot(options);
+			}else{
+				plot.setData(data, true);
+			}
+		}
+		this.getPlot = function(){ return plot; };
 	}
 })();
