@@ -58,25 +58,30 @@
 			var target1 = document.getElementById("plot-1");
 			var target2 = document.getElementById("plot-2");
 			
-			var autoSeries1 = new uPlot.lazy.AutoSeries(target1, 150, {x0: 0, xStep: 1}, {
+			var autoSeries1 = new uPlot.lazy.AutoSeries(target1, 150, {
+				x0: 0, xStep: 1,
+				//xIsTimestamp: true	//alternative to x0 + xStep -> use UNIX time
+			}, {
 				title: "Sine Waves",
 				drawType: "line_linear",
 				//pointSize: 4,
 				//pointWidth: 1,
 				//fill: ["#e24d421a", "#3caea31a"],
 				yRange: [-1*(amplitude + 10), amplitude + 10],
-				//rememberMax: true,
 				showLegend: true,
 				xLabel: "x",
 				yLabel: ["Sine A", "Sine B"]
 			});
 			
-			var autoSeries2 = new uPlot.lazy.AutoSeries(target2, 1000, {x0: 0, xStep: 1}, {
+			var autoSeries2 = new uPlot.lazy.AutoSeries(target2, 1000, {
+				x0: 0, 
+				xStep: 1,
+				rememberMax: true
+			},{
 				//title: "Noise",
 				drawType: "line_linear",
 				strokeWidth: 1,
 				//yRange: [-1, 1],
-				rememberMax: true,
 				showAxisX: false,
 				showLegend: false,
 				showPoints: false
