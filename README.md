@@ -83,3 +83,8 @@ See 'examples' folder or https://byteteilchen.de/uplot-lazy/index.html and https
   <img src="screenshots/custom_step.png" alt="custom_step"/>
 </p>
 
+## More Credits
+
+* [uPlot](https://github.com/leeoniya/uPlot) - MIT License
+* lazy.histogram - MIT License - Original: https://github.com/eoinmurray/histogram
+* Gaussian distribution - MIT License - Original: https://github.com/errcw/gaussian

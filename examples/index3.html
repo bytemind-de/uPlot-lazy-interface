@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Even More Graphs</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script src="uPlot.iife.min-1.5.2.js"></script>
+		<link rel="stylesheet" href="uPlot.min-1.5.2.css">
+		
+		<!-- import this AFTER uPlot -->
+		<!--<script src="../src/uPlot-lazy.js"></script>-->
+		<script src="../dist/uPlot-lazy.min.js"></script>
+		<script src="../dist/uPlot-lazy-histogram.min.js"></script>
+		<script src="../dist/uPlot-lazy-heatmap.min.js"></script>
+		
+		<script src="gaussian.min.js"></script>
+		
+		<style>
+			body {
+				margin: 0;
+				text-align: center;
+				background: #1e2125;
+				color: #eee;
+				font-family: sans-serif;
+			}
+			.chart {
+				display: inline-block;
+				margin: 30px 0;
+				width: 80%;
+				height: 258px;	/* includes title and legend if set */
+				border: 1px solid #888;
+				overflow: auto;
+			}
+			.u-select {
+				background: rgba(255,255,255,0.07);
+			}
+			.u-marker {
+				border-radius: 1px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>uPlot Lazy Examples 3</h2>
+		<div id="plot-1" class="chart"></div>
+		<div><button onclick="start();">START</button><button onclick="stop();">STOP</button></div>
+		<div id="plot-2" class="chart"></div>
+		<script>
+			var x = [0, 1, 2, 3, 4];
+			var y1 = [0, 15, 0, -10, 0];
+			var y2 = [5, 5, 5, 5, 5];
+			
+			var data = [x, y1, y2];
+			
+			function createGaussDist(mean, variance, resolution, n){
+				var distribution = gaussian(mean, variance);
+				var d = distribution.random(resolution);
+				var hist = uPlot.lazy.histogram({
+					data: d,
+					//custom array or object:
+					bins: {
+						start: (mean - 6*variance), 
+						end: (mean + 6*variance), 
+						n: n
+					}
+				});
+				return {x: hist.x, y: hist.y};
+			}
+			
+			var plot = uPlot.lazy.plot({
+				targetElement: document.getElementById("plot-1"),
+				title: "Custom smooth line and area fill",
+				drawType: 'line_smooth',
+				points: [{show: true, size: 8, fill: '#efefef'}, {show: false}],
+				fill: [null, "#efefef1a"],
+				strokeWidth: 1,
+				showLegend: true,
+				yLabel: ["signal", "base line"],
+				data: [x, y1, y2]
+			});
+			
+			var heatmap = new uPlot.lazy.Heatmap(document.getElementById("plot-2"), {
+				dataPixelWidth: 4,
+				dataPixelHeight: 4,
+				colorIndex: 0,	//0: grayscale, 1: blue to red
+				maxDataPoints: 150
+			});
+			var gMean = 0;
+			var gVariance = 0.5;
+			var gRes = 200;
+			var gN = 42;
+			heatmap.addDataArray(createGaussDist(gMean, gVariance, gRes, gN).y);
+			heatmap.draw();
+			
+			var t = 0;
+			var timesteps;
+			function start(){
+				timesteps = setInterval(function(){
+					heatmap.addDataArray(createGaussDist(gMean, gVariance, gRes, gN).y);
+					heatmap.draw();
+					t+=1;
+				}, 1000/20);
+			}
+			function stop(){
+				clearInterval(timesteps);
+			}
+			
+		</script>
+	</body>
+</html>
