@@ -52,7 +52,10 @@ var plot = uPlot.lazy.plot({
 
 ## Examples
 
-See 'examples' folder or https://byteteilchen.de/uplot-lazy/index.html and https://byteteilchen.de/uplot-lazy/index2.html
+See 'examples' folder or hosted versions:
+* [Example 1: Basics](https://byteteilchen.de/uplot-lazy/index.html)
+* [Example 2: Dynamic Series](https://byteteilchen.de/uplot-lazy/index2.html)
+* [Example 3: More options and heatmap](https://byteteilchen.de/uplot-lazy/index3.html)
 
 ## Roadmap
 
