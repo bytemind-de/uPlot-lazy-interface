@@ -5,12 +5,17 @@
 		<title>More Graphs</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
+		<!-- uPlot -->
 		<script src="uPlot.iife.min-1.5.2.js"></script>
 		<link rel="stylesheet" href="uPlot.min-1.5.2.css">
 		
 		<!-- import this AFTER uPlot -->
 		<!--<script src="../src/uPlot-lazy.js"></script>-->
 		<script src="../dist/uPlot-lazy.min.js"></script>
+		
+		<!-- helpers -->
+		<script src="gaussian.min.js"></script>
+		
 		<style>
 			body {
 				margin: 0;
@@ -46,12 +51,14 @@
 			var amplitude = 40;
 			var frequency = 20;
 			var shift1 = 32;
+			var gaussDist = gaussian(0, 0.5);	//mean, var
 						
 			function getSine(x){
 				return Math.round(amplitude * Math.sin(x/frequency));
 			}
 			function getNoise(x){
-				return (Math.random()*2 - 1);
+				//return (Math.random()*2 - 1);
+				return gaussDist.ppf(Math.random());
 			}
 			
 			//Prepare plots

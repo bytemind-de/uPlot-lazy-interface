@@ -3,7 +3,7 @@
 Simplified interface for [uPlot](https://github.com/leeoniya/uPlot) the lightweight (~30KB), super fast (check the benchmarks) chart library.  
   
 uPlot is a great library to visualize time series data, but getting started can be a bit complicated due to the many settings options and the interface that was designed to optimize performance.
-If you don't need to tweak your charts down to the last detail but just want to quickly plot some basic point-, line- or bar-charts with reasonable defaults then 'uPlot-lazy' (~4KB) is the right extension for you ;-).
+If you don't need to tweak your charts down to the last detail but just want to quickly plot some basic point-, line- or bar-charts with reasonable defaults then 'uPlot-lazy' (~5KB) is the right extension for you ;-).
   
 ## Quick start
 
