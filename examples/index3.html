@@ -53,14 +53,14 @@
 		<div>
 			<button onclick="start();">START</button><button onclick="stop();">STOP</button><br>
 			<br>
-			<label>Color Index:</label><select onchange="setColorIndex(this);" style="height: 21px;">
+			<label>Color Index:</label><select onchange="setColorIndex(this);" style="min-height: 21px;">
 				<option value=0>0: Grayscale</option>
 				<option value=1>1: Blue->Red</option>
 				<option value=2>2: 240 - HSL</option>
 				<option value=3>3: HSL + 60</option>
 				<option value=4 selected>4: Extended HSL</option>
 			</select>
-			<label>Z-Function:</label><select onchange="setHeatmapFun(this);" style="height: 21px;">
+			<label>Z-Function:</label><select onchange="setHeatmapFun(this);" style="min-height: 21px;">
 				<option value="gauss">Random Gauss</option>
 				<option value="sine">Sine</option>
 			</select>
