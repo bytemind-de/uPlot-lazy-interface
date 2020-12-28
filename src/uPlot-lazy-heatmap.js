@@ -24,6 +24,10 @@
 		var data;
 		var minZ, maxZ, zRange;
 		
+		this.resetMax = function(){
+			minZ = undefined;
+			maxZ = undefined;
+		}
 		this.setData = function(fullData){
 			data = fullData;
 		};
@@ -54,7 +58,7 @@
 		this.draw = function(){
 			if (!data) return;
 			var yOffset = 0;
-			var colorRange = 255/zRange;
+			var colorRange = colorData[colorIndex].max/zRange;
 			data.forEach(function(dataArray, i){
 				for (let j=0; j<dataArray.length; j++){
 					let y = dataArray[j];
@@ -65,16 +69,27 @@
 				}
 			});
 		};
-		function getColor(val){
-			return colorFun[colorIndex](val);
+		this.setColorIndex = function(newIndex){
+			colorIndex = newIndex;
 		}
-		var colorFun = {
-			0: function(val255){
-				return 'rgb(' + val255 + ',' + val255 + ',' + val255 + ')';	//grayscale
-			},
-			1: function(val255){
-				return 'rgb(' + val255 + ', 0,' + (255 - val255) + ')';	//blue to red
-			}
+		function getColor(val){
+			return colorData[colorIndex].fun(val);
+		}
+		var colorData = {
+			//grayscale
+			0: { max: 255, fun: function(val){ return 'rgb(' + val + ',' + val + ',' + val + ')'; }},
+			//blue to red
+			1: { max: 255, fun: function(val){ return 'rgb(' + val + ', 0,' + (255 - val) + ')'; }},
+			//240 - HSL
+			2: { max: 299, fun: function(val){ return 'hsl(' + (240 - val) + ', 100%, 50%)'; }},
+			//HSL + 60
+			3: { max: 359, fun: function(val){ return 'hsl(' + (60 + val) + ', 100%, 50%)'; }},
+			//Extended HSL
+			4: { max: 399, fun: function(val){ 
+				if (val < 50){ return 'hsl(240, 75%, ' + (val) + '%)'; }
+				else if (val < 349){ return 'hsl(' + (240 - val + 50) + ', 75%, 50%)'; }
+				else{ return 'hsl(-59, 75%, ' + (val - 299) + '%)'; }
+			}}
 		}
 				
 		this.cloneCanvas = function(newTargetElement){

@@ -9,7 +9,9 @@
 		<link rel="stylesheet" href="uPlot.min-1.5.2.css">
 		
 		<!-- import this AFTER uPlot -->
-		<!--<script src="../src/uPlot-lazy.js"></script>-->
+		<!-- <script src="../src/uPlot-lazy.js"></script>
+		<script src="../src/uPlot-lazy-histogram.js"></script>
+		<script src="../src/uPlot-lazy-heatmap.js"></script> -->
 		<script src="../dist/uPlot-lazy.min.js"></script>
 		<script src="../dist/uPlot-lazy-histogram.min.js"></script>
 		<script src="../dist/uPlot-lazy-heatmap.min.js"></script>
@@ -23,6 +25,9 @@
 				background: #1e2125;
 				color: #eee;
 				font-family: sans-serif;
+			}
+			label {
+				margin: 0 8px 0 16px;
 			}
 			.chart {
 				display: inline-block;
@@ -42,31 +47,66 @@
 	</head>
 	<body>
 		<h2>uPlot Lazy Examples 3</h2>
+		<h3 style="margin: 32px 0 0 0;">Static uPlot (more options)</h3>
 		<div id="plot-1" class="chart"></div>
-		<div><button onclick="start();">START</button><button onclick="stop();">STOP</button></div>
+		<h3>Dynamic Heatmap</h3>
+		<div>
+			<button onclick="start();">START</button><button onclick="stop();">STOP</button><br>
+			<br>
+			<label>Color Index:</label><select onchange="setColorIndex(this);" style="height: 21px;">
+				<option value=0>0: Grayscale</option>
+				<option value=1>1: Blue->Red</option>
+				<option value=2>2: 240 - HSL</option>
+				<option value=3>3: HSL + 60</option>
+				<option value=4 selected>4: Extended HSL</option>
+			</select>
+			<label>Z-Function:</label><select onchange="setHeatmapFun(this);" style="height: 21px;">
+				<option value="gauss">Random Gauss</option>
+				<option value="sine">Sine</option>
+			</select>
+			<label>Gauss resolution:</label><input onchange="setGaussResolution(this);" value=1000 style="width: 75px;">
+		</div>
 		<div id="plot-2" class="chart"></div>
 		<script>
+			//Data (static)
 			var x = [0, 1, 2, 3, 4];
 			var y1 = [0, 15, 0, -10, 0];
 			var y2 = [5, 5, 5, 5, 5];
-			
 			var data = [x, y1, y2];
 			
-			function createGaussDist(mean, variance, resolution, n){
-				var distribution = gaussian(mean, variance);
-				var d = distribution.random(resolution);
+			//Draw functions (heatmap)
+			var N = 84;
+			var zFun = createGaussDist;	//createSine
+			var colorIndex = 4;
+			
+			var gMean = 0;
+			var gVariance = 0.5;
+			var gRes = 1000;
+			function createGaussDist(n){
+				var distribution = gaussian(gMean, gVariance);
+				var d = distribution.random(gRes);
 				var hist = uPlot.lazy.histogram({
 					data: d,
 					//custom array or object:
 					bins: {
-						start: (mean - 6*variance), 
-						end: (mean + 6*variance), 
+						start: (gMean - 6*gVariance), 
+						end: (gMean + 6*gVariance), 
 						n: n
 					}
 				});
 				return {x: hist.x, y: hist.y};
 			}
+			function createSine(n){
+				var x = [];
+				var y = [];
+				for (let i=0; i<n; i++){
+					x.push(i);
+					y.push(Math.sin((i/n)*(2*Math.PI)));
+				}
+				return {x: x, y: y};
+			}
 			
+			//PLOT 1 - Static smooth line + base-line with area fill
 			var plot = uPlot.lazy.plot({
 				targetElement: document.getElementById("plot-1"),
 				title: "Custom smooth line and area fill",
@@ -79,30 +119,50 @@
 				data: [x, y1, y2]
 			});
 			
+			//PLOT 2 - Dynamic Heatmap
 			var heatmap = new uPlot.lazy.Heatmap(document.getElementById("plot-2"), {
 				dataPixelWidth: 4,
 				dataPixelHeight: 4,
-				colorIndex: 0,	//0: grayscale, 1: blue to red
+				colorIndex: colorIndex,	//0: grayscale, 1: blue to red
 				maxDataPoints: 150
 			});
-			var gMean = 0;
-			var gVariance = 0.5;
-			var gRes = 200;
-			var gN = 42;
-			heatmap.addDataArray(createGaussDist(gMean, gVariance, gRes, gN).y);
+			heatmap.addDataArray(zFun(N).y);
 			heatmap.draw();
 			
+			//Time-steps
 			var t = 0;
 			var timesteps;
 			function start(){
 				timesteps = setInterval(function(){
-					heatmap.addDataArray(createGaussDist(gMean, gVariance, gRes, gN).y);
+					heatmap.addDataArray(zFun(N).y);
 					heatmap.draw();
 					t+=1;
 				}, 1000/20);
 			}
 			function stop(){
 				clearInterval(timesteps);
+			}
+			
+			//Heatmap UI settings
+			function setColorIndex(sel){
+				colorIndex = sel.value;
+				console.log("Heatmap ColorIndex:", colorIndex);
+				heatmap.setColorIndex(colorIndex);
+				heatmap.draw();
+			}
+			function setHeatmapFun(sel){
+				if (sel.value == "sine"){
+					zFun = createSine;
+				}else{
+					zFun = createGaussDist;
+				}
+				console.log("Heatmap Z-Function:", zFun.name);
+				heatmap.resetMax();
+			}
+			function setGaussResolution(ele){
+				gRes = +ele.value;
+				console.log("Gauss resolution:", gRes);
+				heatmap.resetMax();
 			}
 			
 		</script>
