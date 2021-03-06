@@ -140,7 +140,7 @@ See 'examples' folder or hosted versions:
 	width:	480,				//leave undefined for targetElement width
 	height: 240,				//leave undefined for targetElement height
 	title: "Custom smooth line and area fill",
-    drawType: "line_smooth",	//"points", "line_linear", "line_smooth", "bars", "bars_thin", custom
+	drawType: "line_smooth",	//"points", "line_linear", "line_smooth", "bars", "bars_thin", custom
 	//showPoints: false,
 	//pointSize: 6,				//size for every point (low priority)
 	//pointWidth: 1,			//(border) width for every point (low priority)
@@ -151,11 +151,11 @@ See 'examples' folder or hosted versions:
 	//	stroke: "#ffffff",
 	//	fill: "#aaaaaa"
 	//},
-    points: [{show: true, size: 8, fill: '#efefef'}, {show: false}],
+	points: [{show: true, size: 8, fill: '#efefef'}, {show: false}],
 	//stroke: "#e24d42",		//first line color (rest is taken from default color palette)
 	stroke: ["#e24d42", "#3caea3"],
 	strokeWidth: 1,
-    //fill: "#efefef1a",		//first fill color (rest is taken from default color palette)
+	//fill: "#efefef1a",		//first fill color (rest is taken from default color palette)
 	fill: [null, "#efefef1a"],
 	showLegend: false,
 	isTime: false,
