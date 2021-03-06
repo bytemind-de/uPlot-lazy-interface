@@ -1,5 +1,6 @@
 (function(){
 	uPlot.lazy = {};
+	uPlot.lazy.version = "0.9.1";
 	
 	//render types
 	uPlot.lazy.drawTypes = {
@@ -19,6 +20,8 @@
 	uPlot.lazy.axisFont = "12px sans-serif";
 	uPlot.lazy.axisGridSize = 1;
 	uPlot.lazy.axisTickSize = 1;
+	uPlot.lazy.axisSizeX = 50;
+	uPlot.lazy.axisSizeY = 50;
 	uPlot.lazy.pointSize = 6;
 	uPlot.lazy.pointWidth = 1;
 	uPlot.lazy.strokeWidth = 2;
@@ -68,7 +71,9 @@
 		var axisFont = cfg.axisFont || uPlot.lazy.axisFont;
 		var axisTickSize = cfg.axisTickSize || uPlot.lazy.axisTickSize;
 		var axisGridSize = cfg.axisGridSize || uPlot.lazy.axisGridSize;
-		return [
+		var axisSizeX = cfg.axisSizeX || uPlot.lazy.axisSizeX;
+		var axisSizeY = cfg.axisSizeY || uPlot.lazy.axisSizeY;
+		var axisCfg = [
 			{
 				show: (cfg.showAxisX != undefined? cfg.showAxisX : true),
 				stroke: axisStroke,
@@ -81,7 +86,8 @@
 				ticks: {
 					width: axisTickSize / devicePixelRatio,
 					stroke: axisGridStroke,
-				}
+				},
+				size: axisSizeX
 			},{
 				show: (cfg.showAxisY != undefined? cfg.showAxisY : true),
 				stroke: axisStroke,
@@ -94,9 +100,12 @@
 				ticks: {
 					width: axisTickSize / devicePixelRatio,
 					stroke: axisGridStroke,
-				}
+				},
+				size: axisSizeY
 			}
 		];
+		if (cfg.labelTransform) cfg.labelTransform.forEach(function(lt, i){ axisCfg[i].values = lt; }); //example: (u, vals, space) => vals.map(v => v + '° C')
+		return axisCfg;
 	}
 	
 	function seriesSettings(cfg){
@@ -153,9 +162,6 @@
 	uPlot.lazy.getPlotOptions = function(cfg){
 		if (!cfg.targetElement) cfg.targetElement = document.body;
 		
-		cfg.targetElement.style.background = cfg.chartBackground || uPlot.lazy.chartBackground;
-		cfg.targetElement.style.color = cfg.chartTextColor || uPlot.lazy.chartTextColor;
-		
 		//auto-size and adjust height for title and legend
 		if (!cfg.width || !cfg.height){
 			var canvasSize = canvasSize = calculateInitialSize(cfg);
@@ -179,18 +185,28 @@
 			series: seriesSettings(cfg)
 		};
 		opts.targetElement = cfg.targetElement;		//remember that
+		opts.lazyStyleSettings = {
+			chartBackground: cfg.chartBackground,
+			chartTextColor: cfg.chartTextColor
+		}
 		
 		return opts;
 	}
 	//direct plot
 	uPlot.lazy.plot = function(cfg){
 		var opts = uPlot.lazy.getPlotOptions(cfg);
+		addStylesToContainer(cfg);
 		return new uPlot(opts, cfg.data, cfg.targetElement);
 	}
 	//plot with options
 	uPlot.lazy.plotWithOptions = function(options, data, appendChart){
 		if (!appendChart) options.targetElement.innerHTML = "";
+		addStylesToContainer(options.lazyStyleSettings);
 		return new uPlot(options, data, options.targetElement);
+	}
+	function addStylesToContainer(cfg){
+		cfg.targetElement.style.background = cfg.chartBackground || uPlot.lazy.chartBackground;
+		cfg.targetElement.style.color = cfg.chartTextColor || uPlot.lazy.chartTextColor;
 	}
 	
 	//number generators
