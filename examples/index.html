@@ -157,6 +157,8 @@
 				showLegend: true,
 				xLabel: "time",
 				yLabel: "value",
+				labelTransform: [function(u, xv, space){ return xv.map(t => t + "s"); }],
+				legendTransform: [function(u, t){ return (t + "s"); }],
 				data: data1				//TODO: multiple bars don't work well here
 			});
 			

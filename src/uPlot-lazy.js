@@ -1,6 +1,6 @@
 (function(){
 	uPlot.lazy = {};
-	uPlot.lazy.version = "0.9.1";
+	uPlot.lazy.version = "0.9.2";
 	
 	//render types
 	uPlot.lazy.drawTypes = {
@@ -138,6 +138,7 @@
 				points: points 
 			});
 		}
+		if (cfg.legendTransform) cfg.legendTransform.forEach(function(lt, i){ s[i].value = lt; }); //example: (u, v) => (v + '° C')
 		return s;
 	}
 	function fillArray(items, rest, requiredN){
@@ -195,18 +196,18 @@
 	//direct plot
 	uPlot.lazy.plot = function(cfg){
 		var opts = uPlot.lazy.getPlotOptions(cfg);
-		addStylesToContainer(cfg);
+		addStylesToContainer(cfg.targetElement, cfg);
 		return new uPlot(opts, cfg.data, cfg.targetElement);
 	}
 	//plot with options
 	uPlot.lazy.plotWithOptions = function(options, data, appendChart){
 		if (!appendChart) options.targetElement.innerHTML = "";
-		addStylesToContainer(options.lazyStyleSettings);
+		addStylesToContainer(options.targetElement, options.lazyStyleSettings);
 		return new uPlot(options, data, options.targetElement);
 	}
-	function addStylesToContainer(cfg){
-		cfg.targetElement.style.background = cfg.chartBackground || uPlot.lazy.chartBackground;
-		cfg.targetElement.style.color = cfg.chartTextColor || uPlot.lazy.chartTextColor;
+	function addStylesToContainer(te, cfg){
+		te.style.background = cfg.chartBackground || uPlot.lazy.chartBackground;
+		te.style.color = cfg.chartTextColor || uPlot.lazy.chartTextColor;
 	}
 	
 	//number generators

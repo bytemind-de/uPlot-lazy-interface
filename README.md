@@ -174,7 +174,8 @@ See 'examples' folder or hosted versions:
 	axisGridSize: 1,
 	axisSizeX: 50,
 	axisSizeY: 50,
-	labelTransform: [function(u, xv, space){ return xv.map(t => t + '° C'); }]		//transform labels of each axis (i=0..n)
+	labelTransform: [function(u, xv, space){ return xv.map(t => t + '° C'); }],	//transform labels of each axis tick (i=0..n)
+	legendTransform: [function(u, t){ return (t + "s"); }]		//transform labels of each legend when hovering over data
 }
 ```
 
